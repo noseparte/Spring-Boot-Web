@@ -1,0 +1,39 @@
+.required { 
+   border-color: darkgoldenrod;
+}
+
+.hplusRow {
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.hplusHover{
+	background-color: #F8AC59;
+}
+
+.hplusProgress{
+	z-index: 9999 !important;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width:100%;
+	height:100%;
+	display:none;
+}
+
+.hplusProgress .background{
+	width:100%;
+	height:100%;
+	background-color: black;
+	filter:Alpha(Opacity=50);/*ie*/
+	-moz-opacity:0.5;/*firefox*/
+	opacity: 0.5;/*other*/
+}
+
+.hplusProgress .progressRow{
+	z-index: 9999 !important;
+	width: 50%;
+	top: 30%;
+	position: absolute;
+	left: 25%; 
+}

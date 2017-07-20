@@ -1,0 +1,417 @@
+@charset "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+	border: none;
+	outline: none
+}
+
+input::-moz-focus-inner,a::-moz-focus-inner,button::-moz-focus-inner {
+	border: 0
+}
+
+ul,li {
+	list-style: none
+}
+
+a {
+	text-decoration: none
+}
+
+.clearfix {
+	zoom: 1
+}
+
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden
+}
+
+.word-break {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+html,body {
+	height: 100%;
+	-webkit-text-size-adjust: 100%;
+	-moz-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+	text-size-adjust: 100%
+}
+
+body {
+	font: 14px/1.5 "宋体","Microsoft YaHei","微软雅黑","Lucida Grande","Helvetica Neue", "sans-serif";
+	color: #292929;
+	color: rgba(0,0,0,0.82);
+	background: #f7f4f4
+}
+
+.slide-show-container {
+	width: 100%;
+	position: relative
+}
+
+.slide-show-container:after {
+	content: '';
+	width: 100%;
+	height: 6px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: 1050;
+	background: url(../images/sawtooth_bg.png) left bottom repeat-x
+}
+
+.wrap {
+	width: 100%;
+	margin: 0 auto
+}
+
+.wrap ul.menu li {
+	float: left;
+	width: 25%
+}
+
+.wrap ul.menu li a {
+	display: block;
+	height: 100%
+}
+
+.wrap ul.menu li a img {
+	width: 100%
+}
+
+.wrap ul.ad li {
+	height: 100%
+}
+
+.wrap ul.ad li a {
+	display: block
+}
+
+.wrap ul.ad li a img {
+	width: 100%;
+	margin-top: -6px
+}
+
+.wrap .audio-guide .common-header,.wrap .common-ul .common-header {
+	height: 30px;
+	background-color: #355c7d;
+	margin-top: -6px;
+	position: relative
+}
+
+.wrap .audio-guide .common-header img,.wrap .common-ul .common-header img {
+	width: 20px;
+	height: 18px;
+	margin-left: 5px;
+	margin-top: 6px;
+	position: absolute
+}
+
+.wrap .audio-guide .common-header h4,.wrap .common-ul .common-header h4 {
+	height: 24px;
+	line-height: 24px;
+	padding: 3px 0px;
+	margin-left: 5px;
+	padding-left: 30px;
+	color: #fff;
+	font-weight: 500
+}
+
+.wrap .common-ul {
+	margin-bottom: 50px
+}
+
+.wrap .common-ul .common-header {
+	background-color: #ff7a86
+}
+
+.wrap .common-ul .common-header h4 {
+	height: 24px;
+	line-height: 24px;
+	padding: 3px 0px;
+	margin-left: 5px
+}
+
+.wrap .common-ul ul {
+	padding-top: 5px
+}
+
+.wrap .common-ul ul li {
+	position: relative;
+	vertical-align: middle;
+	padding: 5px 10px 5px 10px
+}
+
+.wrap .common-ul ul li .step-icon {
+	width: 30px;
+	position: absolute;
+	left: 9.6px;
+	top: 10px;
+	z-index: 3
+}
+
+.wrap .common-ul ul li hr.line-top {
+	position: absolute;
+	text-align: center;
+	height: 100%;
+	left: 24.2px;
+	width: 1px;
+	top: 13px
+}
+
+.wrap .common-ul ul li .step-height {
+	position: absolute;
+	left: 1.5px;
+	top: 53%;
+	text-align: center;
+	-webkit-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	transform: rotate(90deg);
+	font-size: 12px;
+	color: red;
+	background: #f7f4f4;
+	width: 45px
+}
+
+.wrap .common-ul ul li .step-height-0 {
+	top: 67.5%
+}
+
+.wrap .common-ul ul li .step-height-1 {
+	top: 62%
+}
+
+.wrap .common-ul ul li .step-height-2 {
+	top: 61%
+}
+
+.wrap .common-ul ul li .step-height-3 {
+	top: 57%
+}
+
+.wrap .common-ul ul li .step-left {
+	width: 16px;
+	position: absolute;
+	left: 53px;
+	top: 25px;
+	z-index: 6
+}
+
+.wrap .common-ul ul li .step-n {
+	position: absolute;
+	color: #fff;
+	top: 15px;
+	width: 21px;
+	left: 14px;
+	text-align: center;
+	font-weight: 900;
+	z-index: 5
+}
+
+.wrap .common-ul ul li .step-detail {
+	display: block;
+	height: 57px;
+	margin-left: 50px;
+	border: 1px solid #ffb2b9;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	padding: 10px 10px 20px 10px;
+	position: relative;
+	background: white;
+	z-index: 5
+}
+
+.wrap .common-ul ul li .step-detail h4 {
+	color: #000;
+	width: 50%
+}
+
+.wrap .common-ul ul li .step-detail .hr-guide-start {
+	position: absolute;
+	left: -37px;
+	top: 17px;
+	margin-top: 33px;
+	padding-bottom: 5px;
+	background-color: #ff7a86;
+	width: 1.5px;
+	height: 55px
+}
+
+.wrap .common-ul ul li .step-detail .hr-step-detail {
+	width: 1px;
+	height: 60px;
+	position: absolute;
+	left: -36px;
+	margin-top: 23px;
+	padding-bottom: 5px
+}
+
+.wrap .common-ul ul li .step-detail .step-introduce {
+	color: #adadad;
+	font-size: 12px;
+	width: 50%
+}
+
+.wrap .common-ul ul li .step-detail .step-img {
+	width: 92px;
+	height: 52px;
+	position: absolute;
+	right: 10px;
+	top: 10px
+}
+
+.wrap .common-ul ul li .step-detail .step-down {
+	position: absolute;
+	left: -43.2px;
+	top: 80%;
+	background: #f7f4f4
+}
+
+.wrap .common-ul ul li .step-detail .see-time {
+	position: absolute;
+	right: 10px;
+	top: 60px;
+	color: #adadad;
+	font-size: 10px;
+	margin-top: 5px
+}
+
+.wrap .common-ul ul li .ul-audio .ul-audio-li {
+	margin-left: 40px
+}
+
+.wrap .common-ul ul li .ul-audio .ul-audio-li a {
+	display: block
+}
+
+.wrap .common-ul ul li .ul-audio .ul-audio-li a .audio-2 {
+	width: 20px
+}
+
+.wrap .common-ul ul li .ul-audio .ul-audio-li a h4 {
+	margin-left: 30px;
+	margin-top: -25px;
+	color: #5e5e5c;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #cbcbcb;
+	font-size: 14px
+}
+
+.wrap .common-ul ul li .ul-audio .ul-audio-li a h4 span {
+	position: absolute;
+	right: 10px;
+	top: 8px;
+	color: #adadad;
+	font-size: 10px
+}
+
+.wrap .common-ul ul li .ul-audio .ul-audio-li .hr-ul-audio-li {
+	width: 1px;
+	height: 20px;
+	position: absolute;
+	left: -25px;
+	padding-bottom: 23px;
+	padding-top: 1px
+}
+
+.wrap .common-ul ul li .ul-audio li.ul-audio-li:last-child h4 {
+	border-bottom: 0px
+}
+
+.wrap .video h2 {
+	width: 100%;
+	text-align: center;
+	margin: 10px 0px 30px 0px
+}
+
+.wrap .video-article {
+	margin-top: 20px;
+	text-indent: 2em;
+	margin: 20px 10px 0px 10px;
+	color: #5e5e5c
+}
+
+.wrap .for-guide-start {
+	margin-bottom: 0px
+}
+
+.wrap .for-guide-start .step-detail p {
+	color: #adadad;
+	font-size: 12px
+}
+
+#guide {
+	background: url("weilijiang/guide-bg.png");
+	height: 100%;
+	text-align: center
+}
+
+#guide .guide-title {
+	width: 57.1875%
+}
+
+#guide .guide-icon {
+	width: 48.75%;
+	margin-top: 200px
+}
+
+.hide {
+	display: none
+}
+
+div.jp-video,div.jp-interface {
+	background: #0c7da7
+}
+
+div.jp-video .jp-progress {
+	border-bottom: 1px solid #999
+}
+
+div.jp-current-time,div.jp-duration {
+	color: white
+}
+
+@media (max-width: 640px) {
+	.wrap {
+		width: 100%
+	}
+}
+
+@media (min-width: 641px) {
+	.wrap {
+		width: 640px
+	}
+}
+
+.ul-out .ul-out-li:last-child .step-detail .hr-step-detail {
+	display: none
+}
+
+.ul-out .ul-out-li:last-child .step-height {
+	display: none
+}
+
+.ul-out .ul-out-li:last-child .ul-audio .ul-audio-li .hr-ul-audio-li {
+	display: none
+}
+
+.clip-two-line {
+	height: 36px
+}
+
+.clip-two-line p {
+	line-height: 18px
+}

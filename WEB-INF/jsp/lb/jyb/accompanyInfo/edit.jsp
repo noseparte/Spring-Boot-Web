@@ -1,0 +1,232 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="/include/taglib.jsp"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<system:header/>
+<!-- jsp文件头和头部 -->
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-title">
+						<h5>陪诊信息</h5>
+					</div>
+					<div class="ibox-content">
+						<form id="GuideForm" name="GuideForm" class="form-horizontal" method="post">
+							<input type="hidden" name="AI_ID" id="AI_ID" value="${pd.AI_ID}" />
+							<input type="hidden" name="SYS_UI_ID" id="SYS_UI_ID" value="${pd.SYS_UI_ID}" />
+							<div class="form-group">
+								<label class="col-sm-2 control-label">姓名：</label>
+							    <div class="col-sm-4">
+									<input type="text" class="form-control required" name="AI_NAME" id="AI_NAME" value="${pd.AI_NAME}" />
+								</div>
+								<label class="col-sm-2 control-label">性别：</label>
+							    <div class="col-sm-4">
+									<select class="form-control required" name="AI_SEX" id="AI_SEX" value="${pd.AI_SEX}">
+										<option value="0" <c:if test="${pd.AI_SEX == 0}">selected="selected"</c:if>>女</option>
+										<option value="1" <c:if test="${pd.AI_SEX == 1}">selected="selected"</c:if>>男</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">出生日期：</label>
+							    <div class="col-sm-4">
+									<input type="text" class="bootstrapdatetimepicker form-control required" name="AI_BIRTHDAY" id="AI_BIRTHDAY" placeholder="请选择出生日期" value="${pd.AI_BIRTHDAY}" />
+								</div>
+								<label class="col-sm-2 control-label">身份证号：</label>
+							    <div class="col-sm-4">
+									<input type="text" class="form-control required" name="AI_IDCARD" id="AI_IDCARD" value="${pd.AI_IDCARD}" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">联系手机：</label>
+							    <div class="col-sm-4">
+									<input type="text" class="form-control required digits" name="AI_PHONE" id="AI_PHONE" value="${pd.AI_PHONE}" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" onBlur="verification();" />
+								</div>
+							</div>
+							<%-- <div class="form-group">
+								<label class="col-sm-2 control-label">用户头像：</label>
+							    <div class="col-sm-10">
+								    <input id="inp" type="file" name="file" multiple class="file-loading">
+									<input type="hidden" class="form-control" name="AI_PHOTO" id="AI_PHOTO" value="${pd.AI_PHOTO}">
+								</div>
+							</div> --%>
+							<div class="hr-line-dashed"></div>
+							<div class="form-group">
+								<div class="col-sm-2 col-sm-offset-5 text-center">
+									<button id="btn_Save" class="btn btn-primary" type="button" onclick="submitForm();">保存内容</button>
+									<button id="btn_Cancel" class="btn btn-white" type="button" onclick="goBack();">取消</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 全局js -->
+    <system:jsFooter/>
+	<!-- 自定义js -->
+	<script type="text/javascript">
+		//表单ID
+		var formId = "#GuideForm";
+		$(document).ready(function(){
+	    	//初始化下拉菜单
+	    	$("#AI_SEX").createOption();
+	    	//表单提交JS验证
+			$(formId).validate({
+				rules: {
+					AI_BIRTHDAY: {
+						date: true,
+						dateISO: true
+					},
+					AI_PHONE: {
+						rangelength: [11, 11],
+						remote: {
+							url: '/accompanyInfo/selectPhone',
+							type: 'POST',
+							dataType: 'JSON',
+							data: {
+								'AI_PHONE': function() {
+									return $('#AI_PHONE').val();
+								},
+								'ID' : function(){
+									return $('#SYS_UI_ID').val();
+								}
+							}
+						} 
+					},
+					AI_IDCARD: {
+						rangelength: [18, 18],
+						remote: {
+							url: "/validates/validateIdCard",
+							type: "POST",
+							dataType: 'JSON',
+							data: {
+								'IDCARD' : function() {
+									return $('#AI_IDCARD').val();
+								}
+							}
+						}
+					}
+				},
+				messages: {
+					AI_BIRTHDAY: "请输入或选择正确的出生日期格式。例如：1970-01-01",
+					AI_PHONE: "输入的手机号格式不正确，或该手机号已被注册。",
+					AI_IDCARD: "身份证号不正确，请输入正确身份证号。"
+				}
+			});
+		});
+		//表单提交
+	    function submitForm(){
+	        var id = $('#AI_ID').val();
+	        var AI_PHOTO = $("#AI_PHOTO").val();
+	        var action = "";
+	    	if(id == ""){
+	    		action = "accompanyInfo/saveAdd";
+	    	}else{
+	    		action = "accompanyInfo/saveEdit";
+	    	}
+	    	$(formId).attr("action", action);
+	    	$(formId).submit();
+	    }
+		//查询手机号是否被注册
+	    //返回到列表页面 
+		function goBack(){
+			this.location.href="<%=basePath%>accompanyInfo/toLists";
+		}
+		
+		var picturePATH = '';
+		var AI_PHOTO = $("#AI_PHOTO").val();
+		if(AI_PHOTO != null && AI_PHOTO != ''){
+			$.ajax({
+				type: "POST",
+				url: '<%=basePath%>filesUploads/findByHttpIdOrMasterId',
+				data: {
+					"ID": AI_PHOTO,
+					"MASTER_ID":AI_PHOTO
+				},
+				dataType: 'json',
+				async:false,
+				//beforeSend: validateData,
+				cache: false,
+				success: function(data) {
+					picturePATH = data[0].PATH;
+					initFileName = data[0].FILE_NAME;
+				}
+			});
+		}
+		//上传头像
+		var IDSAndPid=[];
+		var ids;
+		var MASTER_ID=AI_PHOTO;//master_id(参数是举例，请根据实际传参)
+		var initFileName=""//初始化照片名(参数是举例，请根据实际传参)
+		var initFilePath="D:\\\\20170222\\d8ed7fbd4a9b445cb446f7d727579eb2.jpg"//初始化照片路径(参数是举例，请根据实际传参)
+		var initFileID= "d8ed7fbd4a9b445cb446f7d727579eb2"//初始化照片id，如果多的话可设置为数组(参数是举例，请根据实际传参)
+	    $("#inp").fileinput({
+	    	language: 'zh', //设置语言
+	    	browseClass: "btn btn-primary btn-block",
+	        showCaption: false,//是否在选择按钮旁边显示文件名
+	    	showUpload:false,//是否展示上传按钮
+	    	showRemove:true,//是否展示移除按钮
+	    	//showClose:false,//是否展示关闭按钮
+
+	    	//showDelete: false,//是否显示删除图标
+	    	//showZoom: false//是否显示预览
+	    	showUploadedThumbs:false,//上传完成后是否显示缩略图
+	    	uploadUrl:'/filesUploads/fileUpd',//上传的url
+	    	uploadAsync: true,//异步支持
+	    	//previewFileType: ["text","image"],//文件類型
+	    	allowedFileExtensions: ["gif", "jpeg", "tiff", "bmp",'jpg','png','psd','svg'],//允许上传的文件扩展名
+	    	overwriteInitial: true,
+	        initialPreviewAsData: true,
+	    	initialPreview: [//初始化预览
+	    		picturePATH
+	        ],
+	        initialPreviewConfig: [//初始化设置 {标题 宽度 删除的url 是否顯示刪除 顺序  扩展字符}
+	            {caption: initFileName, width: "120px",url:'/filesUploads/delete',showDelete: true ,key:1,extra: {id: '20e3a27be3d84329833c200772d21a0b'}}        
+	        ],
+	        uploadExtraData: {//上传时附加的参数额外的参数，注意，此处jquery无效。
+	        	"IDS": MASTER_ID,
+	            "MASTER_ID":MASTER_ID
+	        },
+	        //maxFileCount: 10, //表示允许同时上传的最大文件个数
+	        //showCaption: false,//是否显示标题   
+	        //dropZoneEnabled: false//是否显示拖拽区域
+	        //minImageWidth: 50, //图片的最小宽度
+	        //minImageHeight: 50,//图片的最小高度
+	        //maxImageWidth: 1000,//图片的最大宽度
+	        //maxImageHeight: 1000,//图片的最大高度
+	        //maxFileSize: 0,//单位为kb，如果为0表示不限制文件大小
+	        //minFileCount: 0,
+	        //enctype: 'multipart/form-data',
+	        //validateInitialCount:true,
+	    }).on('fileselect', function(event, numFiles, label) {//选择文件时
+	    	$(this).fileinput("upload");//选择完文件后立即上传
+	    })
+	    .on('fileuploaded', function(event, data, previewId, index) {//文件上传成功后
+			var IDS=JSON.parse(data.jqXHR.responseText)[0].id;
+			var path=JSON.parse(data.jqXHR.responseText)[0].path;
+			picturePATH = path;
+			/* $("#I_IDY").val(IDS);
+			console.log(IDS); */
+			$("#AI_PHOTO").val(IDS);
+	 	})
+	 	
+		.on('filedeleted', function(event, id) {//删除预加载的文件
+	        console.log("has filedeleted")
+	        $("#AI_PHOTO").val("");
+		})
+		.on('filecleared', function(event){ //清空的事件
+			$("#AI_PHOTO").val("");
+		})
+		.on('fileremoved', function(event, id) {
+			$("#AI_PHOTO").val("");
+		})
+	</script>
+</body>
+</html>

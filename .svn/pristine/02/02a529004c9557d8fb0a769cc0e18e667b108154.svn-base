@@ -1,0 +1,197 @@
+﻿﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="/include/taglib.jsp"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<system:header/>
+<!-- jsp文件头和头部 -->
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="tn-group">
+					<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<div id="toolbar" class="btn-group">
+							<div class="pull-left form-inline form-group">
+								<select class="form-control required" name="SP_REGISTER_ADDR" id="SP_REGISTER_ADDR" value="${pd.SP_REGISTER_ADDR}"
+                                    	ajax--url="dic/getDicAreaForSelect" ajax--column="ID,TEXT">
+                                    	<option value="">-全国范围-</option>
+                     			</select>
+							    <input type="text" id="SP_NAME" name="SP_NAME" class="form-control" placeholder="输入代理商名称" align="right"/>
+							    <input type="hidden" id="HEL_ID" name="HEL_ID" value="${pd.HEL_ID }">
+								<button type="button" class="btn btn-default btn-primary" onclick="bstQuery();">
+							       	查询
+							    </button>
+							</div>
+						</div>
+						<table id="queryTable" data-mobile-responsive="true"></table>
+						<textarea rows="3" cols="10" style="width:100%;" id="O_CONTENT" name="O_CONTENT"></textarea>
+					</div>
+					<div align="center">
+						<button type="button" class="btn btn-default btn-primary" onclick="saveEdit();" align="center">
+							保存
+						</button>&nbsp;&nbsp;
+						<button type="button" class="btn btn-default btn-primary" onclick="toBack();" align="center">
+						 	取消
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="myModal" class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true"></div>
+	<!-- 全局js -->
+	<system:jsFooter/>
+	<script type="text/javascript">
+		//表格ID
+		var tableId = "#queryTable";
+		var helid = '';
+		var pdsoid = '';
+		//表格请求及数据
+		var tableColumns = {
+			url: 'expertLibsRelate/findAgents?O_ID=${pd.O_ID}',
+			toolbar:'#toolbar',
+			singleSelect: true,
+			columns: [{
+				field:'CHECKBOX',
+				halign: 'center',
+				formatter:checkboxFormatter
+			},{
+		        field: 'SP_ID',
+		        visible:false,
+		        halign: 'center'
+		    }, {
+		        field: 'SP_NAME',
+		        title: '代理商名称',
+		        align: 'left',
+		        halign: 'center'
+		   
+		    }, {
+		        field: 'AREA',
+		        title: '所属地区',
+		        align: 'left',
+		        halign: 'center',
+		       	formatter:function(value,row,index){
+		       		if(row.AREA != null && row.AREA != ''){
+		       			return "<span>" + row.AREA + "</span>";
+		       		}else{
+		       			return "<span>全国</span>";
+		       		}
+		        } 
+		    }],
+		    onLoadSuccess:function(data){
+		    	helid = data.HEL_ID;
+	    		$("#HEL_ID").val(helid);
+		    	if(null != data.pds)
+		    	{
+		    		$("#O_CONTENT").text(data.pds.O_CONTENT);
+		    		pdsoid = data.pds.O_ID;
+		    	}
+		    }
+		};
+		
+		$(document).ready(function (){
+			                                                      
+			table = $(tableId).bootstrapTable(tableColumns);
+			$("#SP_REGISTER_ADDR").createOption();
+		});
+		//查询刷新表格
+		function searchRefreshTable(){
+			//销毁表格
+			$(tableId).bootstrapTable('destroy');
+			$(tableId).bootstrapTable(tableColumns);
+		}
+		//导出Excel
+		function toExport(){
+			$(tableId).bootstrapTable('exportTable', {
+				type : 'excel'
+			});
+		}
+		//取消
+		function toBack(){
+			parent.layer.closeAll();
+		}
+		//默认选中
+		function checkboxFormatter(value,row,index){
+			if(row.CREATE_UID != null){
+				return {
+					disabled :	false,
+					checked : true
+				}
+			}
+			return value;
+		}
+		//保存
+		function saveEdit(){
+			helid = $("#HEL_ID").val();
+			var id = getBstCheckedId('SP_ID');	
+			var CONTENT = $("#O_CONTENT").val();
+			OID = '${pd.O_ID}';
+			var addressPath = '';
+			if(pdsoid == '') {
+				addressPath = 'saveAdd';
+			}
+			else {
+				addressPath = 'saveEdit';
+			}
+			if(!(id.length==1)) {
+				layer.msg("请只选中一条信息再进行编辑");
+				return false;
+			}
+ 			else
+			{
+ 				var idsStr = id.toString();
+				$.ajax({
+					type: "POST",
+					url: '<%=basePath%>expertLibsRelate/' + addressPath,
+					data: {
+						SP_ID: idsStr,
+						O_CONTENT: CONTENT,
+						O_ID: OID,
+						HEL_ID: helid
+					},
+					success: function(data) {
+						
+							if('success'==data.succ){
+								$.ajax({
+									type: "POST",
+									url: '<%=basePath%>expertLibsRelate/pushSP',
+									data: {
+										SP_ID: idsStr,
+										O_ID: OID,
+										HEL_ID: helid
+									},
+									success: function(data) {
+											
+									}
+								});
+								layer.confirm('分单成功', {
+									btn: ['确认'],
+									shade: false,
+									yes: function(index, layero){
+										parent.bstQuery(); //刷新父页面
+										var indexs = parent.layer.getFrameIndex(window.name); //获取窗口索引
+										parent.layer.close(indexs);  // 关闭layer
+									}
+								});
+							}else{
+								layer.confirm('分单失败', {
+									btn: ['确认'],
+									shade: false,
+									yes: function(index, layero){
+										
+									}
+								});
+							}
+					}
+				});
+				
+			} 
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+﻿﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="/include/taglib.jsp"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<system:header/>
+<!-- jsp文件头和头部 -->
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form id="ArticleHealthForm" name="ArticleHealthForm" class="form-horizontal" method="post">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">订单编号：</label>
+							    <div class="col-sm-4">
+									${data.rows[0].onum}
+								</div>
+								<label class="col-sm-2 control-label">下单时间：</label>
+							    <div class="col-sm-4">
+									${data.rows[0].otime}
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">订单类型：</label>
+							    <div class="col-sm-4">
+									${data.rows[0].otype}
+								</div>
+								<label class="col-sm-2 control-label">订单状态：</label>
+							    <div class="col-sm-4">
+									${data.rows[0].ostatus}
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">注意事项：</label>
+							    <div class="col-sm-10">
+									${data.rows[0].ocontent} 
+								</div>
+							</div>
+							<div class="form-group" style="text-align:center;">
+								<c:if test="${pd.spinfoOID eq 'null'}">
+									<input type="button" class="btn btn-default btn-primary" disabled onclick="spDesc('${data.rows[0].oid }');" value="代理商"></input>
+								</c:if>
+								<c:if test="${pd.spinfoOID ne 'null'}">
+									<input type="button" class="btn btn-default btn-primary" onclick="spDesc('${data.rows[0].oid }');" value="代理商"></input>
+								</c:if>
+								<c:if test="${pd.expertlibsOID eq 'null'}">
+									<input type="button" class="btn btn-default btn-primary" disabled onclick="expertLibsDesc('${data.rows[0].oid }');" value="专家库"></input>
+								</c:if>
+								<c:if test="${pd.expertlibsOID ne 'null'}">
+									<input type="button" class="btn btn-default btn-primary" onclick="expertLibsDesc('${data.rows[0].oid }');" value="专家库"></input>
+								</c:if>
+								<c:if test="${pd.accompanyinfoOID eq 'null'}">
+									<input type="button" class="btn btn-default btn-primary" disabled onclick="accompanyDesc('${data.rows[0].oid }');" value="陪诊人员"></input>
+								</c:if>
+								<c:if test="${pd.accompanyinfoOID ne 'null'}">
+									<input type="button" class="btn btn-default btn-primary" onclick="accompanyDesc('${data.rows[0].oid }');" value="陪诊人员"></input>
+								</c:if>
+								<c:if test="${pd.keynodeOID eq 'null'}">
+									<input type="button" class="btn btn-default btn-primary" disabled onclick="keyNodeDesc('${data.rows[0].oid }');" value="就诊过程"></input>
+								</c:if>
+								<c:if test="${pd.keynodeOID ne 'null'}">
+									<input type="button" class="btn btn-default btn-primary" onclick="keyNodeDesc('${data.rows[0].oid }');" value="就诊过程"></input>
+								</c:if>
+								<c:if test="${pd.evaluateOID eq 'null'}">
+									<%-- <input type="button" class="btn btn-default btn-primary" disabled onclick="orderEvalDesc('${data.rows[0].oid }');" value="评价信息"></input> --%>
+								</c:if>
+								<c:if test="${pd.evaluateOID ne 'null'}">
+									<input type="button" class="btn btn-default btn-primary" onclick="orderEvalDesc('${data.rows[0].oid }');" value="评价信息"></input>
+								</c:if>
+							</div>
+							<div class="hr-line-dashed"></div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="myModal" class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true">
+	<!-- 全局js -->
+	<system:jsFooter/>
+	<script type="text/javascript">
+		function expertLibsDesc(O_ID){
+			layer.open({
+			    type: 2,
+			    title: '专家库信息',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["hospitalGuide/toLists_expertLibs?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});
+		}
+		function spDesc(O_ID){
+			layer.open({
+			    type: 2,
+			    title: '代理商信息',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["hospitalGuide/toLists_sp?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});
+		}
+		function accompanyDesc(O_ID){
+			layer.open({
+			    type: 2,
+			    title: '陪诊人员信息',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["hospitalGuide/toLists_accompany?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});
+		}
+		function keyNodeDesc(O_ID){
+			layer.open({
+			    type: 2,
+			    title: '就诊过程记录',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["hospitalGuide/toLists_keyNode?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});
+		}
+		function orderEvalDesc(O_ID){
+			layer.open({
+			    type: 2,
+			    title: '评价信息',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["hospitalGuide/toLists_eval?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});
+		}
+		
+	</script>
+</body>
+</html>

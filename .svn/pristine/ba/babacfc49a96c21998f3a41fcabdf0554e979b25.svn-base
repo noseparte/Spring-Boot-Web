@@ -1,0 +1,363 @@
+package com.maryun.lb.controller.jyb.agency;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.maryun.controller.base.BaseController;
+import com.maryun.model.PageData;
+import com.maryun.utils.UrlDecode;
+
+/**
+ * 
+ * @version
+ */
+@Controller
+@RequestMapping(value = "/agency/orderManagement")
+public class AgencyOrderManagementController extends BaseController {
+
+	/**
+	 * 跳转列表页面(未处理订单)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists")
+	public ModelAndView toLists() {
+		return new ModelAndView("lb/jyb/agency/list");
+	}
+
+	/**
+	 * 跳转列表页面(全部订单)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_all")
+	public ModelAndView toLists_all() {
+		return new ModelAndView("lb/jyb/agency/list_all");
+	}
+
+	/**
+	 * 跳转列表页面(全部订单)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_assign")
+	public ModelAndView toLists_assign() {
+		PageData pd = this.getPageData();
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/assignList_all");
+		mv.addObject("pd", pd);
+		return mv;
+	}
+
+	/**
+	 * 用户信息沟通备忘录
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearch_MEMO")
+	@ResponseBody
+	public Object pageSearch_MEMO() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "agency/pageSearch_MEMO", pd);
+	}
+
+	/**
+	 * 订单查询(未处理订单)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearch")
+	@ResponseBody
+	public Object pageSearch() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "agency/pageSearch", pd);
+	}
+
+	/**
+	 * 订单查询(全部订单)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearch_all")
+	@ResponseBody
+	public Object pageSearch_all() {
+		PageData pd = this.getPageData();
+		pd.put("USER_ID", this.getUser().getString("USER_ID"));
+		return this.pd(systemServer + "agency/pageSearch_all", pd);
+	}
+
+	/**
+	 * 分派订单--专家页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearchAssign_expert")
+	@ResponseBody
+	public Object pageSearchAssign_expert() {
+		PageData pd = this.getPageData();
+		pd.put("USER_ID", this.getUser().getString("USER_ID"));
+		return this.pd(systemServer + "agency/pageSearchAssign_expert", pd);
+	}
+
+	/**
+	 * 分派订单--专家实现
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/assign_expertSure")
+	@ResponseBody
+	public Object assign_expertSure() {
+		PageData pd = this.getPageData();
+		pd = this.savePage(pd);
+		return this.pd(systemServer + "agency/assign_expertSure", pd);
+	}
+
+	/**
+	 * 分派订单--陪诊人员页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearchAssign_accompany")
+	@ResponseBody
+	public Object pageSearchAssign_accompany() {
+		PageData pd = this.getPageData();
+		pd.put("USER_ID", this.getUser().getString("USER_ID"));
+		return this.pd(systemServer + "agency/pageSearchAssign_accompany", pd);
+	}
+
+	/**
+	 * 分派订单--陪诊人员实现
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/assign_accompanySure")
+	@ResponseBody
+	public Object assign_accompanySure() {
+		PageData pd = this.getPageData();
+		pd = this.savePage(pd);
+		return this.pd(systemServer + "agency/assign_accompanySure", pd);
+	}
+
+	/**
+	 * 订单查询(全部待分派专家)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/assignToExpert")
+	@ResponseBody
+	public Object pageSearch_assignToExpert() {
+		PageData pd = this.getPageData();
+		// 把未分派的订单ID集合拿到
+		return this.pd(systemServer + "agency/assignToExpert", pd);
+	}
+
+	/**
+	 * 订单查询(全部待分派陪诊人员订单)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/assignToAccompany")
+	@ResponseBody
+	public Object pageSearch_assignToAccompany() {
+		PageData pd = this.getPageData();
+		// 把未分派的订单ID集合拿到
+		return this.pd(systemServer + "agency/assignToAccompany", pd);
+	}
+
+	/**
+	 * 订单查询(全部待分派专家和陪诊人员订单)
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/assignToExpertAndAccompany")
+	@ResponseBody
+	public Object pageSearch_assignToExpertAndAccompany() {
+		PageData pd = this.getPageData();
+		// 把未分派的订单ID集合拿到
+		return this.pd(systemServer + "agency/assignToExpertAndAccompany", pd);
+	}
+
+	/**
+	 * 历史订单查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearch_historyorder")
+	@ResponseBody
+	public Object pageSearch_historyorder() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "agency/pageSearch_historyorder", pd);
+	}
+
+	/**
+	 * 订单详情页面的用户历史订单查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_uinameDesc")
+	public ModelAndView toLists_uinameDesc() {
+		// 页面传过来的参数
+		PageData pd = this.getPageData();
+		// 后台传过来的参数(调用前台数据)
+		Object data = this.pd(systemServer + "agency/uinameDesc", pd);
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/uinamelist");
+		// 返回数据给前台
+		mv.addObject("data", data);
+		mv.addObject("pd", pd);
+		return mv;
+	}
+
+	/**
+	 * 订单详情页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_onumDesc")
+	public ModelAndView toLists_onumDesc() {
+		// 页面传过来的参数
+		PageData pd = this.getPageData();
+		// 后台传过来的参数(调用前台数据)
+		Object data = this.pd(systemServer + "agency/onumDesc", pd);
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/onumlist");
+		// 返回数据给前台
+		mv.addObject("data", data);
+		mv.addObject("pd", pd);
+		return mv;
+	}
+
+	/**
+	 * 跳转到订单查询专家库列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_expertLibs")
+	public ModelAndView toLists_expertLibsDesc() {
+		// 页面传过来的参数
+		PageData pd = this.getPageData();
+		// 后台传过来的参数(调用前台数据)
+		Object data = this.pd(systemServer + "agency/expertLibsDesc", pd);
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/expertLibslist");
+		// 返回数据给前台
+		mv.addObject("data", data);
+		return mv;
+	}
+
+	/**
+	 * 跳转到订单查询代理商列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_sp")
+	public ModelAndView toLists_spDesc() {
+		PageData pd = this.getPageData();
+		// 后台传过来的参数(调用前台数据)
+		Object data = this.pd(systemServer + "agency/spDesc", pd);
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/splist");
+		// 返回数据给前台
+		mv.addObject("data", data);
+		return mv;
+	}
+
+	/**
+	 * 跳转到订单查询陪诊人员列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_accompany")
+	public ModelAndView toLists_accompanyDesc() {
+		PageData pd = this.getPageData();
+		// 后台传过来的参数(调用前台数据)
+		Object data = this.pd(systemServer + "agency/accompanyDesc", pd);
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/accompanylist");
+		// 返回数据给前台
+		mv.addObject("data", data);
+		return mv;
+	}
+
+	/**
+	 * 跳转到订单查询就诊过程记录列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_keyNode")
+	public ModelAndView toLists_keyNodeDesc() {
+		PageData pd = this.getPageData();
+		// 后台传过来的参数(调用前台数据)
+		Object data = this.pd(systemServer + "agency/keyNodeDesc", pd);
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/keyNodelist");
+		// 返回数据给前台
+		mv.addObject("data", data);
+		return mv;
+	}
+
+	/**
+	 * 跳转到订单查询评价信息列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists_eval")
+	public ModelAndView toLists_evalDesc() {
+		PageData pd = this.getPageData();
+		// 后台传过来的参数(调用前台数据)
+		// 评价内容数据
+		Object data = this.pd(systemServer + "agency/evalDesc", pd);
+		// 评价星级数据
+		Object datalevel = this.pd(systemServer + "agency/evallevelDesc", pd);
+
+		ModelAndView mv = new ModelAndView("lb/jyb/agency/evallist");
+		// 返回数据给前台
+		mv.addObject("data", data);
+		mv.addObject("datalevel", datalevel);
+		return mv;
+	}
+
+	/**
+	 * 修改接单状态
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/changeSpStatus")
+	@ResponseBody
+	public Object changeSpStatus() {
+		PageData pd = this.getPageData();
+		pd = this.updatePage(pd);
+		return this.pd(systemServer + "agency/changeSpStatus", pd);
+	}
+	/**
+	 * 代理商退单
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/notPass")
+	@ResponseBody
+	public Object notPass() {
+		PageData pd = this.getPageData();
+		pd = this.updatePage(pd);
+		return this.pd(systemServer + "agency/notPass", pd);
+	}
+
+	/**
+	 * 申请退款前的判断
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/prrefund")
+	@ResponseBody
+	public Object prrefund() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "agency/prrefund", pd);
+	}
+
+	/**
+	 * 申请退款
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/refund")
+	@ResponseBody
+	public Object refund() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "agency/refund", pd);
+	}
+}

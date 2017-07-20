@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>html5响应式触摸音频播放插件——AUDIOPLAYER.JS</title>
+<link rel="stylesheet" href="css/_reset.css" />
+<link rel="stylesheet" href="css/main.css" />
+<link rel="stylesheet" href="css/css?family=Advent+Pro">
+<link rel="stylesheet" href="css/lanrenzhijia.css" />
+</head>
+<body>
+<div id="wrapper">
+  <h1>Audio Player:</strong> Responsive <em>&amp;</em> Touch-friendly</h1>
+  <audio preload="auto" controls>
+ 
+    <source src="13012464917.wav" />
+  </audio>
+</div>
+<script src="js/main.js"></script>
+<script src="js/audioplayer.js"></script>
+<script>
+	$( function()
+	{
+		$( 'audio' ).audioPlayer();
+	});
+</script>
+</body>
+</html>

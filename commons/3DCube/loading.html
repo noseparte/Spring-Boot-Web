@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+	<link rel="stylesheet" type="text/css" href="css/default.css">
+	<script src="js/prefixfree.min.js" type="text/javascript"></script>
+	<!--[if IE]>
+		<script src="http://libs.useso.com/js/html5shiv/3.7/html5shiv.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+
+	<div class="" style="width: 100%;text-align: center">
+			<span>文档处理中... </span>
+		<div align="center" style="direction: ltr;width: 100%">
+        
+	        <div class="wrap">
+	            <div class="cube">
+	                <div class="front">
+	                    <!-- <h2>Front side</h2> -->
+	                </div>
+	                <div class="back">
+	                    <!-- <h2>Back side</h2> -->
+	                </div>
+	                <div class="top">
+	                    <!-- <h2>Top side</h2> -->
+	                </div>
+	                <div class="bottom">
+	                    <!-- <h2>Bottom side</h2> -->
+	                </div>
+	                <div class="left">
+	                    <!-- <h2>Left side</h2> -->
+	                </div>
+	                <div class="right">
+	                    <!-- <h2>Right side</h2> -->
+	                </div>
+	                <i class="i_front"></i>
+	                <i class="i_back"></i>
+	                <i class="i_top"></i>
+	                <i class="i_bottom"></i>
+	                <i class="i_left"></i>
+	                <i class="i_right"></i>
+	            </div>
+	        </div>
+
+	       <!--  <div style="text-align:center;padding-top:150px;">
+	            更多HTML5效果请访问<a href="http://www.5iweb.com.cn" target="_blank">网页特效库</a>。
+	        </div> -->
+	    </div>
+	</div>
+	
+	<style>
+            body {
+                background-color: #eee;
+            }
+
+            .wrap {
+                margin-top: 120px;
+                perspective: 700px;
+                perspective-origin: 50% 50%;
+                background-image: linear-gradient(135deg,#ccc 25%,#6699cc 25%,#6699cc 50%, #ccc 50%, #ccc 75%,#6699cc 75%,#6699cc 100%);
+                background-size: 80px 80px;
+                border-top: solid 3px #6699cc;
+                border-bottom: solid 3px #6699cc;
+                /* Background stripes animation */
+                animation: bganim 3s linear 2s infinite;
+            }
+
+            @keyframes bganim {
+                from {
+                    background-position: 0px;
+                }
+
+                to {
+                    background-position: 80px;
+                }
+            }
+
+            .cube {
+                margin: auto;
+                position: relative;
+                height: 128px;
+                width: 128px;
+                transform-style: preserve-3d;
+            }
+
+                .cube div {
+                    position: absolute;
+                    padding: 10px;
+                    box-sizing: border-box;
+                    height: 100%;
+                    width: 100%;
+                    opacity:0.9;
+                    background-color: #fff;
+                    border: solid 1px #EBEBEB;
+                    color: #fff;
+                    font: 10px arial;
+                    transition: transform 0.2s ease-in;
+                }
+
+            .front {
+                background: url(img1/doxc.png);
+                transform: translateZ(64px);
+            }
+
+            .back {
+                background: url(img1/pptx.png);
+                transform: translateZ(-64px) rotateY(180deg);
+            }
+
+            .right {
+                background: url(img1/html.png);
+                transform: rotateY(-270deg) translateX(64px);
+                transform-origin: top right;
+            }
+
+            .left {
+                background: url(img1/xls.png);
+                transform: rotateY(270deg) translateX(-64px);
+                transform-origin: center left;
+            }
+
+            .top {
+                background: url(img1/zip.png);
+                transform: rotateX(-270deg) translateY(-64px);
+                transform-origin: top center;
+            }
+
+            .bottom {
+                background: url(img1/swf.png);
+                transform: rotateX(270deg) translateY(64px);
+                transform-origin: bottom center;
+            }
+            /* inner cube */
+            i{
+              position:absolute;
+              top:32px;
+              left:32px;
+              width:64px;
+              height:64px;
+              display:block;
+              background:url(img/synchonize.png);
+              transition: all 1s linear;
+            }
+            i.i_front{
+              transform: translateZ(32px);
+            }
+            i.i_back{
+              transform: translateZ(-32px) rotateY(180deg);
+            }
+            i.i_bottom{
+              transform:rotateX(-90deg) translateY(32px);
+              transform-origin: left bottom;
+            }
+            i.i_left{
+              transform:rotateY(270deg) translateX(-32px);
+              transform-origin: center left;
+            }
+            i.i_right{
+              transform:rotateY(-270deg) translateX(32px);
+              transform-origin: top right;
+            }
+            i.i_top{
+              transform:rotateX(-270deg) translateY(-32px);
+              transform-origin: left top;
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotateX(0deg) rotateY(0deg);
+                }
+
+                to {
+                    transform: rotateX(360deg) rotateY(360deg);
+                }
+            }
+
+            .cube {
+                animation: rotate 20s infinite linear;
+            }
+
+            .wrap:hover .front {
+                transform: translateZ(100px);
+            }
+
+            .wrap:hover .back {
+                transform: translateZ(-100px) rotateY(180deg);
+            }
+
+            .wrap:hover .right {
+                transform: rotateY(-270deg) translateZ(64px) translateX(64px);
+            }
+
+            .wrap:hover .left {
+                transform: rotateY(270deg) translateZ(64px) translateX(-64px);
+            }
+
+            .wrap:hover .top {
+                transform: rotateX(-270deg) translateZ(64px) translateY(-64px);
+            }
+
+            .wrap:hover .bottom {
+                transform: rotateX(270deg) translateZ(64px) translateY(64px);
+            }
+        </style>
+</body>
+</html>

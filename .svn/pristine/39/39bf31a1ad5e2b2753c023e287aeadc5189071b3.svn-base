@@ -1,0 +1,44 @@
+
+*{ margin:0 auto; padding:0;}
+body{ background:#3d8dd6;}
+
+.img{ background:url(../img/right_bot.png) no-repeat; position:absolute; right:0; bottom:0; width:814px; height:809px;background-size:cover}
+.text{ font-size:60px; color:#FFF;font-family:"微软雅黑";}
+.input_01{ float:left; width:200px; height:40px; border-radius:5px 5px 5px 5px;}
+.yhm{ width:100%; height:100%; border-radius:5px 5px 5px 5px; border:none; text-align:center; font-size:18px;}
+.input_02{ float:left; width:150px; height:40px;  border-radius:5px 5px 5px 5px; margin-left:20px;}
+.input_03{ float:left; width:120px; height:40px; border-radius:5px 0px 0px 5px; margin-left:20px;}
+.input_04{ float:left; width:80px; height:40px; background:#FFF; box-sizing:border-box;  text-align:center;vertical-align:middle; background:#95d4ff; color:#FFF; font-size:16px; background-size:cover;}
+.yhm_0{ width:100%; height:100%; border-radius:5px 0px 0px 5px; border:none; text-align:center;font-size:18px;}
+.input_05{ float:left; width:40px; height:40px;box-sizing:border-box; padding-top:10px; text-align:center; background:#95d4ff; border-radius:0px 5px 5px 0px;cursor:pointer;}
+
+.input_06{ float:left; width:60px; height:40px;box-sizing:border-box; text-align:center; background:#95d4ff; border-radius:5px 5px 5px 5px; margin-left:20px; color:#FFF; font-size:16px;cursor:pointer;}
+.input_06:active{background:#67befa;}
+.denglu{ height:40px; width:725px; margin:auto; margin-top:20px;}
+
+.con{ width:845px; height:145px;  margin-left:85px; position:absolute; z-index:99; left:85px; top:35%;}
+
+
+
+@media screen and (max-width: 1680px) { /*瑜版挸鐫嗛獮鏇炴槀鐎电鐨禍锟�1080px閺冭绱濇惔鏃傛暏娑撳娼伴惃鍑淪S閺嶅嘲绱�*/
+.img{ background:url(../img/right_bot.png) no-repeat; position:absolute; right:0; bottom:0; width:814px; height:809px; background-size:cover}
+}
+
+@media screen and (max-width: 1580px) { /*瑜版挸鐫嗛獮鏇炴槀鐎电鐨禍锟�1580px閺冭绱濇惔鏃傛暏娑撳娼伴惃鍑淪S閺嶅嘲绱�*/
+.img{ background:url(../img/right_bot.png) no-repeat; position:absolute; right:0; bottom:0; width:714px; height:709px;background-size:cover}
+
+}
+
+@media screen and (max-width: 1366px) { /*瑜版挸鐫嗛獮鏇炴槀鐎电鐨禍锟�1366px閺冭绱濇惔鏃傛暏娑撳娼伴惃鍑淪S閺嶅嘲绱�*/
+.img{ background:url(../img/right_bot.png) no-repeat; position:absolute; right:0; bottom:0; width:614px; height:609px;background-size:cover}
+}
+
+@media screen and (max-width: 1250px) { /*瑜版挸鐫嗛獮鏇炴槀鐎电鐨禍锟�1366px閺冭绱濇惔鏃傛暏娑撳娼伴惃鍑淪S閺嶅嘲绱�*/
+.img{ background:url(../img/right_bot.png) no-repeat; position:absolute; right:0; bottom:0; width:514px; height:509px;background-size:cover}
+}
+.loginpage .nousername, .loginpage .nopassword, .nologincode, .erruserinfo, .errarginfo, .errTimeinfo, .errscodeinfo, .userVisitorNoStart { display: none; }
+
+.loginbox .loginmsg { 
+	background: #fffccc;width:100px; color: #333; margin-bottom: 10px; padding: 5px; text-align: center; font-size: 11px; 
+	-moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
+}

@@ -1,0 +1,491 @@
+﻿﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="/include/taglib.jsp"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<system:header/>
+<!-- jsp文件头和头部 -->
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-title">
+						<h5>代理商订单管理</h5>
+					</div>
+					<div class="ibox-content">
+						<div id="toolbar" class="btn-group">
+							<div class="pull-left form-inline form-group">
+								  未分配专家<input type="checkbox" id="expert"  class="form-control" />
+								 未分配陪诊人员<input type="checkbox" id="accompany"  class="form-control" />
+							    <input type="text" style="width:120px;" id="O_NUM" name="O_NUM" value="${pd.O_NUM}" class="form-control" placeholder="订单号" />
+							    <input type="text" style="width:120px;" id="UI_NAME" name="UI_NAME" value="${pd.UI_NAME}" class="form-control" placeholder="用户姓名" />
+							    <%-- <input type="text" style="width:120px;" id="O_TIME" name="O_TIME" value="${pd.O_TIME }" class="bootstrapdatetimepicker form-control" placeholder="下订单时间" /> --%>
+							    <input type="text" id="BEGIN_TIME" name="BEGIN_TIME" value="${pd.BEGIN_TIME }" class="bootstrapdatetimepicker form-control" placeholder="开始时间" style="width:120px;"/>
+							    <input type="text" id="END_TIME" name="END_TIME" value="${pd.END_TIME }" class="bootstrapdatetimepicker form-control" placeholder="结束时间" style="width:120px;"/>
+							    <select class="form-control" name="O_STATUS" id="O_STATUS" value="${pd.O_STATUS}">
+									<option value="">订单状态</option>
+									<option value="1">待就诊</option>
+									<option value="2">待评价</option>
+									<option value="3">已评价</option>
+									<option value="4">申请退款</option>
+									<option value="5">已退款</option>
+									<option value="6">已付款</option>
+									<option value="8">申请完结</option>
+								</select>
+								<select class="form-control" name="OGS_STATUS" id="OGS_STATUS" value="${pd.OGS_STATUS}">
+									<option value="">接单状态</option>
+									<option value="0">未处理</option>
+									<option value="1">接受订单</option>
+									<option value="2">拒绝接单</option>
+								</select>
+								<button type="button" class="btn btn-default btn-primary" onclick="bstQuery();">
+							       	查询
+							    </button>
+								<button type="button" class="btn btn-danger btn-primary" onclick="refund();">
+							       	退款
+							    </button>
+								<button type="button" class="btn btn-default btn-primary" onclick="toAssign();">
+							       	分单
+							    </button>
+							</div>
+						</div>
+						<table id="queryTable" data-mobile-responsive="true"></table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="myModal" class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true"></div>
+	<!-- 全局js -->
+	<system:jsFooter/>
+	<script type="text/javascript">
+		//表格ID
+		var tableId = "#queryTable";
+		//表格请求及数据
+		var tableColumns = {
+			url: 'agency/orderManagement/pageSearch_all?tm=' + new Date().getTime(),
+			toolbar:'#toolbar' ,
+			columns: [{
+		    	title:'订单ID',
+		        field: 'oid',
+		        visible:false,
+		        halign: 'center',
+		    }, {
+		        field: 'uiname',
+		        title: '姓名',
+		        align: 'center',
+		        halign: 'center',
+		        formatter:function(value,row,index){
+		        	return "<button type=\"button\" class=\"btn btn-link\" onclick=\"uinameDesc('"+row.uiid+"','"+row.oid+"');\">" + row.uiname + "</button>";
+		        } 
+		    }, {
+		        field: 'onum',
+		        title: '订单编号',
+		        align: 'center',
+		        halign: 'center',
+		        formatter:function(value,row,index){
+		        	return "<button type=\"button\" class=\"btn btn-link\" onclick=\"onumDesc('" + row.oid + "','" + row.spinfoOID + "','" + row.expertlibsOID + "','" + row.accompanyinfoOID + "','" + row.keynodeOID + "','" + row.evaluateOID + "');\">" + row.onum + "</button>";
+		        } 
+		    }, {
+		        field: 'otime',
+		        title: '下单时间',
+		        align: 'center',
+		        halign: 'center'
+		    }, {
+		        field: 'otype',
+		        title: '订单类型',
+		        align: 'center',
+		        halign: 'center'
+		    }, {
+		        field: 'ostatus',
+		        title: '订单状态',
+		        align: 'center',
+		        halign: 'center'
+		    },  {
+		        field: 'ogsstatus',
+		        title: '接单状态',
+		        align: 'center',
+		        halign: 'center',
+		        formatter:function(value,row,index){
+		        	var btnState = " disable = false ";
+					if(row.ogsstatuscode != 0){
+						btnState = " disabled = true ";
+					}
+		        	var formate="<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnState + " onclick=\"changeSpStatus('"+row.OGS_ID+"','"+row.ogsstatuscode+"');\">"+row.ogsstatus+"</button>";
+		        	return formate;
+		        }
+		    }, {
+		        field: 'STATUS',
+		        title: '相关信息',
+		        align: 'center',
+		        halign: 'center',
+		        formatter: formatStatusFun
+		    }]
+		};
+		
+		function uinameDesc(UI_ID,O_ID){
+			layer.open({
+			    type: 2,
+			    title: '用户档案',//窗体标题
+			    area: ['100%', '100%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: false,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["agency/orderManagement/toLists_uinameDesc?UI_ID=" + UI_ID+"&O_ID="+O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});
+		}
+		function onumDesc(O_ID,spinfoOID,expertlibsOID,accompanyinfoOID,keynodeOID,evaluateOID){
+			layer.open({
+			    type: 2,
+			    title: '订单详情',//窗体标题
+			    area: ['100%', '100%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: false,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["agency/orderManagement/toLists_onumDesc?O_ID=" + O_ID+"&spinfoOID="+spinfoOID+"&expertlibsOID="+expertlibsOID+"&accompanyinfoOID="+accompanyinfoOID+"&keynodeOID="+keynodeOID+"&evaluateOID="+evaluateOID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});
+		}
+		//浏览专家
+		function expertLibsDesc(expertlibsOID){
+			if(expertlibsOID != null && expertlibsOID != ""){
+				layer.full(
+					layer.open({
+						type: 2,
+						title: '专家浏览',//窗体标题
+						area: ['600px', '600px'],//整个窗体宽、高，单位：像素px
+						fix: false,//窗体位置不固定
+						maxmin: false,//最大、小化是否显示
+						scrollbar: true,//整体页面滚动条是否显示
+						content: ['/hospExpLib/toView?HEL_ID=' + expertlibsOID, 'yes'],//URL地址
+						closeBtn: 1,//显示关闭按钮
+						btn: ['关闭']
+					})
+				);
+			}else{
+				layer.msg("系统未获取到数据主键，请重新选择数据！");
+			}
+			/*layer.open({
+			    type: 2,
+			    title: '专家库信息',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["operator/orderManagement/toLists_expertLibs?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});*/
+		}
+		//浏览陪诊人员
+		function accompanyDesc(accompanyinfoOID){
+			if(accompanyinfoOID != null && accompanyinfoOID != ""){
+				layer.full(layer.open({
+					type: 2,
+					title: '陪诊浏览',//窗体标题
+					area: ['600px', '600px'],//整个窗体宽、高，单位：像素px
+					fix: false,//窗体位置不固定
+					maxmin: true,//最大、小化是否显示
+					scrollbar: true,//整体页面滚动条是否显示
+					content: ['/accompanyInfo/toView?AI_ID=' + accompanyinfoOID, 'yes'],//URL地址
+					closeBtn: 1,//显示关闭按钮
+					btn: ['关闭']
+				}));
+			}else{
+				layer.msg("系统未获取到数据主键，请重新选择数据！");
+			}
+			/*layer.open({
+			    type: 2,
+			    title: '陪诊人员信息',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["operator/orderManagement/toLists_accompany?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});*/
+		}
+		//浏览就诊信息
+		function keyNodeDesc(O_ID){
+			layer.open({
+			    type: 2,
+			    title: '就诊过程记录',//窗体标题
+			    area: ['80%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["operator/orderManagement/toLists_keyNode?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1, //不显示关闭按钮
+			    btn: ['关闭']
+			});
+		}
+		//浏览评价信息
+		function orderEvalDesc(evaluateOID){
+			if(evaluateOID != null && evaluateOID != ""){
+				layer.open({
+					type: 2,
+					title: '订单评价详情',//窗体标题
+					area: ['600px', '600px'],//整个窗体宽、高，单位：像素px
+					fix: false,//窗体位置不固定
+					maxmin: false,//最大、小化是否显示
+					scrollbar: true,//整体页面滚动条是否显示
+					content: ['/evaluate/toView?EVA_ID=' + evaluateOID, 'yes'],//URL地址
+					closeBtn: 1,//显示关闭按钮
+					btn: ['关闭']
+				});
+			}else{
+				layer.msg("系统未获取到数据主键，请重新选择数据！");
+			}
+			/*layer.open({
+			    type: 2,
+			    title: '评价信息',//窗体标题
+			    area: ['30%', '80%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: true,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["operator/orderManagement/toLists_eval?O_ID=" + O_ID, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1 //不显示关闭按钮
+			});*/
+		}
+		
+		$(document).ready(function (){
+			//初始化及查询生成表格内容
+			table = $(tableId).bootstrapTable(tableColumns);
+		});
+		//查询刷新表格
+		function searchRefreshTable(){
+			//销毁表格
+			$(tableId).bootstrapTable('destroy');
+			$(tableId).bootstrapTable(tableColumns);
+		}
+		//导出Excel
+		function toExport(){
+			$(tableId).bootstrapTable('exportTable', {
+				type : 'excel'
+			});
+		}
+		//操作
+		function formatStatusFun(value, row, index){
+        	var btnState = " disable = false ";
+			if(row.expertlibsOID == null || row.expertlibsOID == ''){
+				btnState = " disabled = true ";
+			}
+        	var format_v1 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnState + " onclick=\"expertLibsDesc('" + row.expertlibsOID + "');\">专家</button>";
+        	btnState = " disable = false ";
+			if(row.accompanyinfoOID == null || row.accompanyinfoOID == ''){
+				btnState = " disabled = true ";
+			}
+        	var format_v2 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnState + " onclick=\"accompanyDesc('" + row.accompanyinfoOID + "');\">陪诊</button>";
+        	btnState = " disable = false ";
+			if(row.keynodeOID == null || row.keynodeOID == ''){
+				btnState = " disabled = true ";
+			}
+        	var format_v3 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnState + " onclick=\"keyNodeDesc('" + row.oid + "');\">就诊</button>";
+        	btnState = " disable = false ";
+			if(row.evaluateOID == null || row.evaluateOID == ''){
+				btnState = " disabled = true ";
+			}
+        	var format_v4 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnState + " onclick=\"orderEvalDesc('" + row.evaluateOID + "');\">评价</button>";
+        	return format_v1 + "&nbsp;" + format_v2 + "&nbsp;" + format_v3 + "&nbsp;" + format_v4; 
+		}
+		//退款
+		function refund(){
+			var ids = getBstCheckedId('oid');
+			if((ids.length < 1)){
+				layer.msg('请选中信息再进行退款。');
+				return false;
+			}
+			var idsStr = ids.toString();
+			$.ajax({
+				type: "POST",
+				url: '<%=basePath%>agency/orderManagement/prrefund?O_STATUS=4&tm=' +  new Date().getTime(),
+				data: {
+					IDS: idsStr
+				},
+				dataType: 'json',
+				//beforeSend: validateData,
+				cache: false,
+				success: function(data1) {
+					if(data1.msg == 'error'){
+						layer.msg('请只选择申请退款的选项！');
+						return false;
+					}else{
+						layer.confirm('确定退款吗？', {
+							btn: ['确认','取消'],
+							shade: false,
+							yes: function(index, layero){
+								$.ajax({
+									type: "POST",
+									url: '<%=basePath%>agency/orderManagement/refund?O_STATUS=4&tm=' +  new Date().getTime(),
+									data: {
+										IDS: idsStr
+									},
+									dataType: 'json',
+									//beforeSend: validateData,
+									cache: false,
+									success: function(data) {
+										if (data.msg == 'success') {
+											layer.msg('退款成功！');
+											bstQuery();
+										}else{
+											layer.msg('退款失败！');
+										}
+									}
+								});
+							}
+						});
+					}
+				}
+			});
+		}
+		//修改接单状态
+		function changeSpStatus(OGS_ID,O_ID){
+			layer.confirm('是否接单？', {
+				btn: ['接受','拒绝','取消'],
+				shade: false,
+				btn1: function(index, layero){
+					$.ajax({
+						type: "POST",
+						url: '<%=basePath%>agency/orderManagement/changeSpStatus?tm=' +  new Date().getTime(),
+						data: {
+							"OGS_ID": OGS_ID,
+							"ogsstatus": 1,
+							"O_ID":O_ID
+						},
+						dataType: 'json',
+						//beforeSend: validateData,
+						cache: false,
+						success: function(data) {
+							if (data.msg == 'success') {
+								layer.msg('接单成功！');
+								bstQuery();
+							} else {
+								layer.msg('接单失败！');
+							}
+						}
+					});
+				},btn2: function(index, layero){
+				    //按钮【按钮二】的回调
+				    
+					layer.open({
+						type: 2,
+						title: '退回原因',//窗体标题
+						area: ['350px', '300px'],//整个窗体宽、高，单位：像素px
+						fix: false,//窗体位置不固定
+						maxmin: false,//最大、小化是否显示
+						scrollbar: false,//整体页面滚动条是否显示 
+						content: ['/active/toBackReason', 'no'],//URL地址
+						closeBtn: 0,//不显示关闭按钮
+						btn: ['确定', '取消'],
+						btn1: function(index, layero){
+							var backReason = $(layero).find("iframe")[0].contentWindow.formData();
+							if(backReason != null){
+								$.ajax({
+									type: "POST",
+									url: '<%=basePath%>agency/orderManagement/notPass?tm=' +  new Date().getTime(),
+									data: {
+										"OGS_ID": OGS_ID,
+										"ogsstatus":"2",
+										"O_ID":O_ID,
+										"backReason":backReason								
+									},
+									dataType: 'json',
+									//beforeSend: validateData,
+									cache: false,
+									success: function(data) {
+										if (data.msg == 'success') {
+											layer.msg('接单成功！');
+											bstQuery();
+										} else {
+											layer.msg('接单失败！');
+										}
+									}
+								});
+							}else{
+								layer.msg('未通过需填写退回原因！');
+							}
+						}
+					});
+				    
+					
+				  },btn3: function(index, layero){
+				    //按钮【按钮三】的回调
+				    layer.closeAll('dialog');//关闭按钮
+				  }
+			});
+		}
+		//未分配专家
+		$("#expert").change(function(){
+			if($("#expert").prop("checked")){
+				//设置未分派专家为选中
+				$("#expert").attr('checked', true);
+				if ($('#accompany').attr('checked')) {
+					//全部选中
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/assignToExpertAndAccompany'}); 
+				}else{
+					//只有专家选中了
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/assignToExpert'}); 
+				}
+			}else{
+				//设置未分派专家为未选中
+				$("#expert").attr('checked', false);
+				if ($('#accompany').attr('checked')) {
+					//只有陪诊人员选中了
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/assignToAccompany'}); 
+				}else{
+					//全部未选
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/pageSearch_all'}); 
+				}
+			}
+		});
+		//未分配陪诊人员
+			$("#accompany").change(function(){
+			if($("#accompany").prop("checked")){
+				//设置未分派陪诊人员为选中
+				$("#accompany").attr('checked', true);
+				if ($('#expert').attr('checked')) {
+					//专家也选中了
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/assignToExpertAndAccompany'}); 
+				}else{
+					//只有陪诊人员选中
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/assignToAccompany'}); 
+				}
+			}else{
+				//设置未分派陪诊人员为未选中
+				$("#accompany").attr('checked', false);
+				if ($('#expert').attr('checked')) {
+					//只有专家选中了
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/assignToExpert'}); 
+				}else{
+					//全部未选
+					$(tableId).bootstrapTable('refresh',{'url':'agency/orderManagement/pageSearch_all'}); 
+				}
+			}
+		});
+		//分单操作
+		function toAssign(){
+			//分单
+			var ids = getBstCheckedId('oid');
+			if((ids.length != 1)){
+				layer.msg('请选中一条信息再进行分单操作。');
+				return false;
+			}
+			var idsStr = ids.toString();
+			layer.open({
+			    type: 2,
+			    title: '分单信息',//窗体标题 
+			    area: ['100%', '100%'],//整个窗体宽、高，单位：像素px
+			    fix: false, //窗体位置不固定
+			    maxmin: false,//最大、小化是否显示
+			    scrollbar: false,//整个页面滚动条是否显示
+ 			    content: ["agency/orderManagement/toLists_assign?O_ID="+idsStr, "yes"],//URL地址,yes或者or是表示是否允许出现滚动条 
+			    closeBtn: 1, //不显示关闭按钮
+			    btn: ['关闭']
+			});
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+﻿﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="/include/taglib.jsp"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<system:header/>
+<!-- jsp文件头和头部 -->
+</head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-title">
+						<h5>活动信息管理</h5>
+					</div>
+					<div class="ibox-content">
+						<div id="toolbar" class="btn-group">
+							<div class="pull-left form-inline form-group">
+							    <input type="text" id="A_NAME" name="A_NAME" class="form-control" placeholder="活动名称" />
+								<button type="button" class="btn btn-default btn-primary" onclick="bstQuery();">
+							       	查询
+							    </button>
+							    <button type="button" class="btn btn-default btn-primary" onclick="toAdd();">
+							       	新增
+							    </button>
+							    <button type="button" class="btn btn-default btn-primary" onclick="toEdit();">
+									修改
+							    </button>
+							    <button type="button" class="btn btn-default btn-danger" onclick="toDel();">
+							       	 删除
+							    </button>
+							    <button type="button" class="btn btn-default btn-primary" onclick="toCheck();">
+									送审
+							    </button>
+							    <button type="button" class="btn btn-default btn-primary" onclick="toSyncVideo();">
+									同步视频
+							    </button>
+							</div>
+						</div>
+						<table id="queryTable" data-mobile-responsive="true"></table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="myModal" class="modal inmodal fade" tabindex="-1" role="dialog"  aria-hidden="true"></div>
+	<!-- 全局js -->
+	<system:jsFooter/>
+	<script type="text/javascript">
+		//表格ID
+		var tableId = "#queryTable";
+		//表格请求及数据
+		var tableColumns = {
+			url: 'active/pageSearch?tm=' + new Date().getTime(),
+			toolbar: '#toolbar',
+			columns: [{
+		        field: 'A_ID',
+		        visible: false,
+		        halign: 'center'
+		    }, {
+		        field: 'A_NAME',
+		        title: '活动名称',
+		        align: 'left',
+		        halign: 'center',
+		        width: '25%',
+		        formatter: formatNameFun
+		    }, {
+		        field: 'A_APPLY_STOP',
+		        title: '报名截止时间',
+		        align: 'center',
+		        halign: 'center',
+		        width: '9%'
+		    }, {
+		        field: 'A_START_DATE',
+		        title: '活动日期',
+		        align: 'center',
+		        halign: 'center',
+		        width: '9%'
+		    }, {
+		        field: 'T_A_TYPE',
+		        title: '类型',
+		        align: 'center',
+		        halign: 'center',
+		        width: '5%'
+		    }, {
+		        field: 'A_APPLY_NUM',
+		        title: '报名数',
+		        align: 'center',
+		        halign: 'center',
+		        width: '5%'
+		    }, {
+		        field: 'T_A_ACTI_SHOW_STATE',
+		        title: '显示状态',
+		        align: 'center',
+		        halign: 'center',
+		        width: '5%'
+		    }, {
+		        field: 'T_CHECK_STATE',
+		        title: '状态',
+		        align: 'center',
+		        halign: 'center',
+		        width: '6%',
+		        formatter: formatCheckStatusFun
+		    }, {
+		        field: 'STATUS',
+		        title: '操作',
+		        align: 'center',
+		        halign: 'center',
+		        width: '28%',
+		        formatter: formatStatusFun
+		    }]
+		};
+		$(document).ready(function (){
+			var msg = "${pd.msg}";
+			if(msg != null && msg != ""){
+				if(msg == 'success'){
+					layer.msg("成功维护活动信息！");
+				}else{
+					layer.msg("维护活动信息发生异常，请重试或与管理员联系！");
+				}
+			}
+			//初始化下拉菜单
+			//$("#M_TYPE_ID").createOption();
+			//初始化及查询生成表格内容
+			table = $(tableId).bootstrapTable(tableColumns);
+		});
+		//查询刷新表格
+		function searchRefreshTable(){
+			//销毁表格
+			$(tableId).bootstrapTable('destroy');
+			$(tableId).bootstrapTable(tableColumns);
+		}
+		//导出Excel
+		function toExport(){
+			$(tableId).bootstrapTable('exportTable', {
+				type : 'excel'
+			});
+		}
+		//跳转到新增页面
+		function toAdd(){
+			window.location.href = "<%=basePath%>active/toAdd";
+		}
+		//跳转到编辑页面
+		function toEdit(){
+			var ids = getBstCheckedId('A_ID');
+			if(!(ids.length == 1)){
+				layer.msg('请只选中一条信息再进行编辑。');
+				return false;
+			}
+			window.location.href = "<%=basePath%>active/toEdit?A_ID=" + ids[0];
+		}
+		//批量删除数据
+		function toDel(){
+			var ids = getBstCheckedId('A_ID');
+			if((ids.length < 1)){
+				layer.msg('请选中信息再进行删除。');
+				return false;
+			}
+			var idsStr = ids.toString();
+			layer.confirm('确定删除已选信息吗？', {
+				btn: ['确认','取消'],
+				shade: false,
+				yes: function(index, layero){
+					$.ajax({
+						type: "POST",
+						url: '<%=basePath%>active/toDelete?tm=' +  new Date().getTime(),
+						data: {
+							IDS: idsStr
+						},
+						dataType: 'json',
+						//beforeSend: validateData,
+						cache: false,
+						success: function(data) {
+							if (data.msg == 'success') {
+								layer.msg('删除信息成功');
+								bstQuery();
+							} else {
+								layer.msg('删除信息失败');
+							}
+						}
+					});
+				}
+			});
+		}
+		//送审
+		function toCheck(){
+			var ids = getBstCheckedId('A_ID');
+			if((ids.length < 1)){
+				layer.msg('请选中信息再进行送审。');
+				return false;
+			}
+			var flag = true;
+			$(tableId).bootstrapTable('getSelections').forEach(function(e){
+				var CHECK_STATE = e['A_CHECK_STATE'];
+				if(CHECK_STATE != 0 && CHECK_STATE != 6){
+					flag = false;
+				}
+			});
+			if(!flag){
+				layer.msg('选取信息包括正在进行审核或已审核通过信息，请重新选取！');
+				return false;
+			}else{
+				var idsStr = ids.toString();
+				layer.confirm('确定送审已选临时专家信息吗？', {
+					btn: ['确认','取消'],
+					shade: false,
+					yes: function(index, layero){
+						$.ajax({
+							type: "POST",
+							url: '<%=basePath%>active/toCheck?A_CHECK_STATE=1&tm=' +  new Date().getTime(),
+							data: {
+								IDS: idsStr
+							},
+							dataType: 'json',
+							//beforeSend: validateData,
+							cache: false,
+							success: function(data) {
+								if (data.msg == 'success') {
+									layer.msg('活动送审成功！');
+									bstQuery();
+								} else {
+									layer.msg('活动送审失败！');
+								}
+							}
+						});
+					}
+				});
+			}
+		}
+		//浏览
+		function toView(A_ID){
+			if(A_ID != null && A_ID != ""){
+				layer.full(layer.open({
+					type: 2,
+					title: '信息浏览',//窗体标题
+					area: ['600px', '600px'],//整个窗体宽、高，单位：像素px
+					fix: false,//窗体位置不固定
+					maxmin: true,//最大、小化是否显示
+					scrollbar: true,//整体页面滚动条是否显示
+					content: ['/active/toView?A_ID=' + A_ID, 'yes'],//URL地址
+					closeBtn: 1,//显示关闭按钮
+					btn: ['关闭']
+				}));
+			}else{
+				layer.msg("系统未获取到数据主键，请重新选择数据！");
+			}
+		}
+		//浏览退回原因
+		function toViewBackReason(A_ID){
+			if(A_ID != null && A_ID != ""){
+				layer.open({
+					type: 2,
+					title: '审核退回原因',//窗体标题
+					area: ['600px', '400px'],//整个窗体宽、高，单位：像素px
+					fix: false,//窗体位置不固定
+					maxmin: false,//最大、小化是否显示
+					scrollbar: false,//整体页面滚动条是否显示
+					content: ['/active/toBackReason?A_ID=' + A_ID + "&CL_TYPE=4&CL_LEVEL=6", 'no'],//URL地址
+					closeBtn: 1,//显示关闭按钮
+					btn: ['关闭']
+				});
+			}else{
+				layer.msg("系统未获取到数据主键，请重新选择数据！");
+			}
+		}
+		//发布、取消发布、结束活动
+		function toPublish(A_ID, PUBLISH_STATE){
+			if(A_ID != null && A_ID != "" && PUBLISH_STATE != null && PUBLISH_STATE != ""){
+				var alertMsg = "";
+				var publishFlag = "";
+				if(PUBLISH_STATE == '1'){
+					alertMsg = "结束";
+					publishFlag = "2";
+				}else if(PUBLISH_STATE == '0'){
+					alertMsg = "发布";
+					publishFlag = "1";
+				}
+				layer.confirm('确定' + alertMsg + '已选信息吗？', {
+					btn: ['确认','取消'],
+					shade: false,
+					yes: function(index, layero){
+						$.ajax({
+							type: "POST",
+							url: '<%=basePath%>active/toPublish?tm=' +  new Date().getTime(),
+							data: {
+								A_ID: A_ID,
+								A_PUBLISH_STATE: publishFlag
+							},
+							dataType: 'json',
+							//beforeSend: validateData,
+							cache: false,
+							success: function(data) {
+								if (data.msg == 'success') {
+									layer.msg(alertMsg + '信息成功！');
+									bstQuery();
+								} else {
+									layer.msg(alertMsg + '信息失败！');
+								}
+							}
+						});
+					}
+				});
+			}else{
+				layer.msg("系统未获取到数据主键，请重新选择数据！");
+			}
+		}
+		//选取
+		function toSelect(A_ID, A_TYPE){
+			if(A_ID != null && A_ID != "" && A_TYPE != null && A_TYPE != ""){
+				var urlPath = "";
+				if(A_TYPE == '0'){//个人
+					urlPath = '/actUserRela/toLists?A_ID=' + A_ID;
+				}else if(A_TYPE == '1'){//团体
+					urlPath = '/actGropRela/toLists?A_ID=' + A_ID;
+				}
+				layer.full(
+					layer.open({
+						type: 2,
+						title: '选取报名个人/团体',//窗体标题
+						area: ['600px', '400px'],//整个窗体宽、高，单位：像素px
+						fix: false,//窗体位置不固定
+						maxmin: false,//最大、小化是否显示
+						scrollbar: true,//整体页面滚动条是否显示
+						content: [urlPath, 'yes'],//URL地址
+						closeBtn: 1,//显示关闭按钮
+						btn: ['关闭'],
+						btn1: function(index, layero){
+							bstQuery();
+						}
+					})
+				);
+			}else{
+				layer.msg("系统未获取到数据主键，请重新选择数据！");
+			}
+		}
+		//活动名称
+		function formatNameFun(value, row, index){
+			var format = "<button type=\"button\" class=\"btn btn-link\" onclick=\"toView('" + row.A_ID + "');\">" + row.A_NAME + "</button>";
+			return format;
+		}
+		//状态
+		function formatCheckStatusFun(value, row, index){
+			var format = "";
+			if(row.A_CHECK_STATE != 6){
+				format = row.T_CHECK_STATE;
+			}else{
+				format = "<button type=\"button\" class=\"btn btn-default btn-primary\" onclick=\"toViewBackReason('" + row.A_ID + "');\">退回状态</button>";
+			}
+			return format;
+		}
+		//操作
+		function formatStatusFun(value, row, index){
+			//发布按钮操作状态
+			var btnPublishState = "  ";
+			if(row.A_CHECK_STATE == '4'){
+				btnPublishState = "  ";
+			}else{
+				btnPublishState = " disabled = 'disabled' ";
+			}
+			//选取按钮操作状态
+			var btnSelectState = "  ";
+			if(row.A_CHECK_STATE == '4' && row.A_PUBLISH_STATE == '1'){
+				btnSelectState = "  ";
+			}else{
+				btnSelectState = " disabled = 'disabled' ";
+			}
+			//视频管理按钮操作状态
+			var btnSelectVideoState = "  ";
+			if(row.A_CHECK_STATE == '4' && row.A_PUBLISH_STATE == '1'){
+				btnSelectVideoState = "  ";
+			}else{
+				btnSelectVideoState = " disabled = 'disabled' ";
+			}
+			//发布按钮文字
+			var textPublishState = "";
+			if(row.A_PUBLISH_STATE == '0'){
+				textPublishState = "发布";
+			}else if(row.A_PUBLISH_STATE == '1'){
+				textPublishState = "结束";
+			}else if(row.A_PUBLISH_STATE == '2'){
+				textPublishState = "结束";
+				btnPublishState = " disabled = 'disabled' ";
+			}
+			var format_v1 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnPublishState + " onclick=\"toPublish('" + row.A_ID + "', '" + row.A_PUBLISH_STATE + "');\">" + textPublishState + "</button>";
+			var format_v2 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnSelectState + " onclick=\"toSelect('" + row.A_ID + "', '" + row.A_TYPE + "');\">选取</button>";
+			var format_v3 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnSelectVideoState + " onclick=\"toSelectVideoForOffice('" + row.A_ID + "');\">官方视频</button>";
+			var format_v4 = "<button type=\"button\" class=\"btn btn-default btn-primary\" " + btnSelectVideoState + " onclick=\"toSelectVideoForNet('" + row.A_ID + "');\">网友上传</button>";
+			return format_v1 + "&nbsp;" + format_v2 + "&nbsp;" + format_v3 + "&nbsp;" + format_v4;
+		}
+		//同步视频
+		function toSyncVideo(){
+			layer.confirm('确认要同步已选活动视频信息吗？', {
+				btn: ['确认','取消'],
+				shade: false,
+				yes: function(index, layero){
+					var index = layer.load(1, {
+						  shade: [0.6, '#DEDEDE'] //60%透明度的灰色背景
+					});
+					$.ajax({
+						type: "POST",
+						url: '<%=basePath%>video/toSyncVideo?tm=' +  new Date().getTime(),
+						data: {
+							SyncType: 'actives'
+						},
+						dataType: 'json',
+						//beforeSend: validateData,
+						cache: false,
+						success: function(data) {
+							if (data.msg == 'success') {
+								layer.msg('同步活动视频成功，共同步' + data.size + '条视频记录！');
+							} else {
+								layer.msg('同步活动视频失败！');
+							}
+							layer.close(index);
+						}
+					});
+				}
+			});
+		}
+		//选取官方视频
+		function toSelectVideoForOffice(A_ID){
+			layer.full(
+				layer.open({
+					type: 2,
+					title: '选取官方视频',//窗体标题
+					area: ['800px', '400px'],//整个窗体宽、高，单位：像素px
+					fix: false,//窗体位置不固定
+					maxmin: false,//最大、小化是否显示
+					scrollbar: true,//整体页面滚动条是否显示
+					content: ['/video/toSelOfficeLists?A_ID=' + A_ID + "&V_TYPE=2", 'yes'],//URL地址
+					closeBtn: 1,//显示关闭按钮
+					btn: ['选取', '关闭'],
+					btn1: function(index, layero){
+						var ids = $(layero).find("iframe")[0].contentWindow.formData();
+						$.ajax({
+							type: "POST",
+							url: '<%=basePath%>video/saveSel?tm=' +  new Date().getTime(),
+							data: {
+								A_ID: A_ID,
+								OMS_RES_CODE: ids,
+								V_TYPE: '2'
+							},
+							dataType: 'json',
+							//beforeSend: validateData,
+							cache: false,
+							success: function(data) {
+								if (data.msg == 'success') {
+									layer.msg('选取视频成功！');
+								} else {
+									layer.msg('选取视频失败，请重新选取或联系管理员！');
+								}
+								layer.close(index);
+							}
+						});
+					}
+				})
+			);
+		}
+		//选取网友上传视频
+		function toSelectVideoForNet(A_ID){
+			layer.full(
+				layer.open({
+					type: 2,
+					title: '选取网友上传视频',//窗体标题
+					area: ['800px', '400px'],//整个窗体宽、高，单位：像素px
+					fix: false,//窗体位置不固定
+					maxmin: false,//最大、小化是否显示
+					scrollbar: true,//整体页面滚动条是否显示
+					content: ['/video/toSelNetLists?A_ID=' + A_ID + "&V_TYPE=2", 'yes'],//URL地址
+					closeBtn: 1,//显示关闭按钮
+					btn: ['选取', '关闭'],
+					btn1: function(index, layero){
+						var ids = $(layero).find("iframe")[0].contentWindow.formData();
+						$.ajax({
+							type: "POST",
+							url: '<%=basePath%>userShare/toRecommend?tm=' +  new Date().getTime(),
+							data: {
+								ACTIVE_ID: A_ID,
+								SHARE_ID: ids
+							},
+							dataType: 'json',
+							//beforeSend: validateData,
+							cache: false,
+							success: function(data) {
+								if (data.msg == 'success') {
+									layer.msg('选取视频成功！');
+								} else {
+									layer.msg('选取视频失败，请重新选取或联系管理员！');
+								}
+								layer.close(index);
+							}
+						});
+					}
+				})
+			);
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+package com.maryun.lb.controller.cms.article.sensitiveWords;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.maryun.controller.base.BaseController;
+import com.maryun.model.PageData;
+import com.maryun.utils.UrlDecode;
+/**
+ * 
+ * @ClassName: SensitiveWords 
+ * @Description: 敏感词管理
+ * @author SR 
+ * @date 2017年3月7日
+ */
+@Controller
+@RequestMapping("sensitiveWords")
+public class SensitiveWordsController extends BaseController{
+	 
+	@RequestMapping("list")
+	public ModelAndView list(){
+		ModelAndView mv=new ModelAndView();
+		mv.setViewName("lb/cms/sensitiveWords/sensitiveWords_list");
+		return mv;
+		//return this.viewAndPd("lb/cms/sensitiveWords/sensitiveWords_list", systemServer+"sensitiveWords/sensitiveWordslistPage", getPageData());
+	}
+	
+	@RequestMapping("sensitiveWordslistPage")
+	@ResponseBody
+	public Object sensitiveWordslistPage(){
+		PageData pd = getPageData();
+		return this.pd(systemServer+"sensitiveWords/sensitiveWordslistPage", pd);
+	}
+	
+	@RequestMapping("toAdd")
+	public ModelAndView toAdd(){
+		ModelAndView mv=new ModelAndView();
+		mv.setViewName("lb/cms/sensitiveWords/sensitiveWords_edit");
+		return mv;
+	}
+	
+	@RequestMapping("toEdit")
+	public ModelAndView toEdit(){
+		return this.viewAndPd("lb/cms/sensitiveWords/sensitiveWords_edit", systemServer+"sensitiveWords/toEdit", getPageData());
+	}
+	
+	@RequestMapping("saveAdd")
+	public ModelAndView saveAdd(){
+		PageData pd = getPageData();
+		pd.put("CREATE_UID", this.savePage(getPageData()).getString("CREATE_UID"));
+		return this.viewAndPd("lb/cms/sensitiveWords/sensitiveWords_list",systemServer+"sensitiveWords/saveAdd", pd);
+	}
+	
+	@RequestMapping("saveEdit")
+	@ResponseBody
+	public ModelAndView saveEdit(){
+		PageData pd = getPageData();
+		pd.put("CREATE_UID", this.savePage(getPageData()).getString("CREATE_UID"));
+		return this.viewAndPd("lb/cms/sensitiveWords/sensitiveWords_list",systemServer+"sensitiveWords/saveEdit", pd);
+	}
+	
+	@RequestMapping("delete")
+	@ResponseBody
+	public Object delete(){
+		return this.pd(systemServer+"sensitiveWords/delete", getPageData());
+	}
+}

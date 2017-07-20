@@ -1,0 +1,116 @@
+package com.maryun.lb.controller.jyb.evaluate;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.maryun.controller.base.BaseController;
+import com.maryun.model.PageData;
+
+/**
+ * 类名称：EvaluateController 创建人：ChuMingZe 创建时间：2017年2月20日
+ * 
+ * @version
+ */
+@Controller
+@RequestMapping(value = "/evaluate")
+public class EvaluateController extends BaseController {
+
+	/**
+	 * 跳转到列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists")
+	public ModelAndView toLists() {
+		return new ModelAndView("lb/jyb/evaluate/list");
+	}
+	
+	/**
+	 * 跳转到浏览页面
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/toView")
+	public ModelAndView toView() throws Exception {
+		PageData pd = this.getPageData();
+		return this.viewAndPd("lb/jyb/evaluate/view", systemServer + "evaluate/findById", pd);
+	}
+
+	/**
+	 * 跳转到代理商列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toSPLists")
+	public ModelAndView toSPLists() {
+		return new ModelAndView("lb/jyb/evaluate/list_sp");
+	}
+
+	/**
+	 * 查询
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pageSearch")
+	@ResponseBody
+	public Object pageSearch() throws Exception {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "evaluate/pageSearch", pd);
+	}
+
+	/**
+	 * 代理商查询
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pageSearchBySP")
+	@ResponseBody
+	public Object pageSearchBySP() throws Exception {
+		PageData pd = this.getPageData();
+		pd.put("UI_ID", this.getUser().get("USER_ID"));
+		return this.pd(systemServer + "evaluate/pageSearchBySP", pd);
+	}
+	
+	/**
+	 * 删除
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toDelete")
+	@ResponseBody
+	public Object toDelete() {
+		PageData pd = this.getPageData();
+		pd = this.updatePage(pd);
+		return this.pd(systemServer + "evaluate/toDelete", pd);
+	}
+	/**
+	 * 设置状态为显示
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/changeShow")
+	@ResponseBody
+	public Object changeShow() {
+		PageData pd = this.getPageData();
+		pd = this.updatePage(pd);
+		return this.pd(systemServer + "evaluate/changeShow", pd);
+	}
+	
+	/**
+	 * 设置状态为不显示
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/change")
+	@ResponseBody
+	public Object change() {
+		PageData pd = this.getPageData();
+		pd = this.updatePage(pd);
+		return this.pd(systemServer + "evaluate/change", pd);
+	}
+}

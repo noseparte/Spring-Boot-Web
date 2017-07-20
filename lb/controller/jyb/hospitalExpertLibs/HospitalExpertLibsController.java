@@ -1,0 +1,370 @@
+package com.maryun.lb.controller.jyb.hospitalExpertLibs;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.maryun.controller.base.BaseController;
+import com.maryun.model.PageData;
+import com.maryun.utils.UuidUtil;
+import com.maryun.utils.WebResult;
+
+/**
+ * 类名称：HospitalExpertLibsController 创建人：ChuMingZe 创建时间：2017年2月15日
+ * 
+ * @version
+ */
+@Controller
+@RequestMapping(value = "/hospExpLib")
+public class HospitalExpertLibsController extends BaseController {
+	//系统初始化密码
+	@Value("${system.initialization.password}")
+	public String sysInitPass;
+		
+	/**
+	 * 跳转列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toLists")
+	public ModelAndView toLists() {
+		return new ModelAndView("lb/jyb/hospitalExpertLibs/list");
+	}
+
+	/**
+	 * 跳转到代理商列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toSPLists")
+	public ModelAndView toSPLists() {
+		return new ModelAndView("lb/jyb/hospitalExpertLibs/list_sp");
+	}
+
+	/**
+	 * 跳转到浏览页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toView")
+	public ModelAndView toView() {
+		PageData pd = this.getPageData();
+		return this.viewAndPd("lb/jyb/hospitalExpertLibs/view", systemServer + "hospExpLib/findById", pd);
+	}
+
+	/**
+	 * 跳转审核列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toCheckLists")
+	public ModelAndView toCheckLists() {
+		PageData pd = this.getPageData();
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("lb/jyb/hospitalExpertLibs/checks");
+		mv.addObject("pd", pd);
+		return mv;
+	}
+
+	/**
+	 * 跳转到合并列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toMergeLists")
+	public ModelAndView toMergeLists() {
+		return new ModelAndView("lb/jyb/hospitalExpertLibs/list_merge");
+	}
+
+	/**
+	 * 跳转到重复专家详细列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toMergeViewLists")
+	public ModelAndView toMergeViewLists() {
+		PageData pd = this.getPageData();
+		ModelAndView mv = new ModelAndView("lb/jyb/hospitalExpertLibs/list_mergeView");
+		mv.addObject("pd", pd);
+		return mv;
+	}
+
+	/**
+	 * 跳转到对比合并页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toMerge")
+	public ModelAndView toMerge() {
+		PageData pd = this.getPageData();
+		return this.viewAndPd("lb/jyb/hospitalExpertLibs/edit_merge", systemServer + "hospExpLib/toMerge", pd);
+	}
+
+	/**
+	 * 修改保存对比合并数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/saveMergeEdit")
+	@ResponseBody
+	public Object saveMergeEdit() {
+		PageData pd = this.getPageData();
+		pd = this.savePage(pd);
+		return this.pd(systemServer + "hospExpLib/saveMergeEdit", pd);
+	}
+	/**
+	 * 查询信息为修改
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/findByIdForEdit")
+	@ResponseBody
+	public Object findByIdForEdit() {
+		PageData pd = this.getPageData();
+		return this.viewAndPd("lb/jyb/hospitalExpertLibs/edit_info",systemServer + "hospExpLib/findByIdForEdit", pd);
+	}
+
+	/**
+	 * 跳转到退回原因页面
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/toBackReason")
+	public ModelAndView toBackReason() throws Exception {
+		PageData pd = this.getPageData();
+		return this.viewAndPd("lb/cms/article/backReason", systemServer + "hospExpLib/toBackReason", pd);
+	}
+
+	/**
+	 * 跳转到设置排序页面
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/toSetOrder")
+	public ModelAndView toSetOrder() throws Exception {
+		PageData pd = this.getPageData();
+		return this.viewAndPd("lb/jyb/hospitalExpertLibs/edit_order", systemServer + "hospExpLib/selectSort", pd);
+	}
+	
+	/**
+	 * 修改排序数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/saveSetOrder")
+	@ResponseBody
+	public Object saveSetOrder() {
+		PageData pd = this.getPageData();
+		pd = this.savePage(pd);
+		return this.pd(systemServer + "hospExpLib/saveSetOrder", pd);
+	}
+
+	/**
+	 * 查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearch")
+	@ResponseBody
+	public Object pageSearch() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "hospExpLib/pageSearch", pd);
+	}
+
+	/**
+	 * 代理商查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/pageSearchBySP")
+	@ResponseBody
+	public Object pageSearchBySP() {
+		PageData pd = this.getPageData();
+		pd.put("SYS_UI_ID", this.getUser().get("USER_ID"));
+		return this.pd(systemServer + "hospExpLib/pageSearchBySP", pd);
+	}
+
+	/**
+	 * 合并查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/mergePageSearch")
+	@ResponseBody
+	public Object mergePageSearch() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "hospExpLib/mergePageSearch", pd);
+	}
+
+	/**
+	 * 重复专家查询
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/mergeViewPageSearch")
+	@ResponseBody
+	public Object mergeViewPageSearch() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "hospExpLib/mergeViewPageSearch", pd);
+	}
+
+	/**
+	 * 设置专家模板
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/setTemplate")
+	@ResponseBody
+	public Object setTemplate() {
+		PageData pd = this.getPageData();
+		pd = this.savePage(pd);
+		return this.pd(systemServer + "hospExpLib/setTemplate", pd);
+	}
+
+	/**
+	 * 审核
+	 * @deprecated 总编审核完成后，专家手机当成帐号，写入系统用户表
+	 * @return
+	 */
+	@RequestMapping(value = "/toCheck")
+	@ResponseBody
+	public Object toCheck() {
+		PageData pd = this.getPageData();
+		pd = this.savePage(pd);
+		int i_audit = Integer.parseInt(pd.getString("HEL_AUDIT"));
+		if("4".equals(pd.getString("HEL_AUDIT"))){
+			pd.put("PASSWORD", DigestUtils.md5DigestAsHex(String.join(",", sysInitPass).getBytes()));
+			String s_IDS = pd.getString("IDS");
+			if (null != s_IDS && !"".equals(s_IDS)) {
+				String[] sa_IDS = s_IDS.split(",");
+				pd.put("IDSs", sa_IDS);
+				pd.remove("HEL_AUDIT");
+				pd.put("HEL_AUDIT", i_audit - 1);
+				String s_lists = this.pd(systemServer + "hospExpLib/pageSearch", pd).toString();
+				List<PageData> lists = JSONObject.parseArray(JSON.parseObject(s_lists).getString("rows"), PageData.class);
+				if (lists != null && lists.size() > 0) {
+					PageData pd_user = null;
+					boolean bl_hasUser = true;
+					for (PageData pd_tmp : lists) {
+						pd_user = new PageData();
+						pd_user.put("USERNAME", pd_tmp.getString("PHONENUM"));
+						pd_user = this.postForPageData(systemServer + "user/hasU", pd_user);
+						if(this.resSuccCode.equals(pd_user.getString("state"))){
+							pd_user = JSON.parseObject(pd_user.getString("content"), PageData.class);
+							bl_hasUser = Boolean.parseBoolean(pd_user.getString("result"));
+						}else{
+							bl_hasUser = false;
+						}
+						
+						pd_user.remove("msg");
+						
+					}
+					pd.put("lists", s_lists);
+				}else{
+					return WebResult.requestFailed(200, "failed", null);
+				}
+			}else{
+				return WebResult.requestFailed(200, "failed", null);
+			}
+		}
+		pd.put("HEL_AUDIT", i_audit);
+		return this.pd(systemServer + "hospExpLib/toCheck", pd);
+	}
+	
+	/**
+	 * 合并状态
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/toMergeEnd")
+	@ResponseBody
+	public Object toMergeEnd() throws Exception {
+		PageData pd = this.getPageData();
+		pd = this.updatePage(pd);
+		return this.pd(systemServer + "hospExpLib/toMergeEnd", pd);
+	}
+	
+	/**
+	 * 显示状态
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/toShow")
+	@ResponseBody
+	public Object toShow() throws Exception {
+		PageData pd = this.getPageData();
+		pd = this.updatePage(pd);
+		return this.pd(systemServer + "hospExpLib/toShow", pd);
+	}
+	/**
+	 * 跳转到合并列表页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/to_editsp")
+	public ModelAndView to_editsp() {
+		ModelAndView mv = new ModelAndView();
+		mv = this.getModelAndView();
+		PageData pd = this.getPageData();
+		mv.addObject("pd", pd);
+		mv.setViewName("lb/jyb/hospitalExpertLibs/edit_sp");
+		return mv;
+	}
+	/**
+	 * 修改专家
+	 * @return
+	 */
+	@Value("${system.initialization.password}")
+	public String PASSWORD;
+	@RequestMapping(value = "/saveEditForEdit")
+	@ResponseBody
+	public Object saveEditForEdit() {
+		PageData pd = this.getPageData();
+		pd = this.savePage(pd);
+		String userId = UuidUtil.get32UUID();
+		pd.put("PASSWORD", DigestUtils.md5DigestAsHex(String.join(",", userId, PASSWORD).getBytes()));
+		pd.put("STATUS", "0");
+		pd.put("TYPE", "5");
+		pd.put("USER_ID", userId);
+		return this.viewAndPd("lb/jyb/hospitalExpertLibs/list", systemServer + "hospExpLib/saveEditForEdit", pd);
+	}
+	/**
+	 * 查找找专家库专家绑定的代理商
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/selectSP")
+	@ResponseBody
+	public Object selectSP() {
+		PageData pd = this.getPageData();
+		return this.pd(systemServer + "hospExpLib/selectSP", pd);
+	}
+	/**
+	 * 查询手机号是否被占用
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/findByIdForPhone")
+	@ResponseBody
+	public Object findByIdForPhone() throws Exception {
+		PageData pd = this.getPageData();
+		PageData userPd = this.postForPageData(systemServer + "hospExpLib/findByIdForPhone", pd);
+		if (this.resSuccCode.equals(userPd.getString("state"))) {
+			userPd = JSON.parseObject(userPd.getString("content"), PageData.class);
+			return Boolean.parseBoolean(userPd.getString("result"));
+		}
+		else {
+			return false;
+		}
+	}
+}
